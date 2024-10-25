@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Budget {
-  item String @id
+  title String @unique
   quantity String
   price String
 
