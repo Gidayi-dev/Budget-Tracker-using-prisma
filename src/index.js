@@ -76,33 +76,35 @@ app.get("/budget/:title", async(req, res) => {
 });
 //update a budget
 app.patch("/budget/:title", async (req, res) => {
-    const userTitle  = req.params.title
+    const userTitle = req.params.title;
+    const { title, price, quantity } = req.body;
 
-    const {title, price, quantity} = req.body;
-   try {
-    let updatedBudget;
-
-    if (title) {
-        updatedBudget = await client.budget.update({
-            where : {
-                title:userTitle
+    try {
+        const updatedBudget = await client.budget.update({
+            where: { title: userTitle },
+            data: {
+                ...(title && { title }),
+                ...(price && { price }),
+                ...(quantity && { quantity }),
             },
-            data : {
-                title: title
-            }
-        })
+        });
+
+        res.status(200).json({ message: "Budget updated successfully", data: updatedBudget });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
-
-    if
-    res.send(updatedBudget);
-   } catch (error) {
-    res.status(500).send({message: error.message});
-   }
-
 });
 //deleting a contact
-app.delete("/budget/:item", (req, res) => {
-    res.send("deleting a single budget")
+app.delete("/budget/:title", async (req, res) => {
+    const title = req.params.title;
+    try {
+        await client.budget.delete({
+            where: { title },
+        });
+        res.status(200).json({ message: "Budget deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 });
 
 app.listen(4000, ()=>{
